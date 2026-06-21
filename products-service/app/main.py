@@ -12,7 +12,6 @@ el precio y el nombre de un producto antes de crear un pedido.
 import time
 import psutil
 
-INICIO = time.time()   # momento en que arranco el proceso (para el uptime)
 
 from fastapi import FastAPI, HTTPException
 
@@ -21,6 +20,7 @@ app = FastAPI(
     description="Catálogo de productos de la tienda (Módulo 3 - ISY1101)",
     version="1.0.0",
 )
+INICIO = time.time()   # momento en que arranco el proceso (para el uptime)
 
 # Base de datos en memoria (didáctica). En un escenario real iría a una BD.
 PRODUCTS = {

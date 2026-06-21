@@ -15,8 +15,6 @@ Es consumido por orders-service vía HTTP interno:
 import time
 import psutil
 
-INICIO = time.time()   # momento en que arranco el proceso (para el uptime)
-
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -26,6 +24,7 @@ app = FastAPI(
     description="Control de stock de la tienda (Módulo 3 - ISY1101)",
     version="1.0.0",
 )
+INICIO = time.time()   # momento en que arranco el proceso (para el uptime)
 
 # Stock inicial en memoria: product_id -> unidades disponibles.
 STOCK = {
