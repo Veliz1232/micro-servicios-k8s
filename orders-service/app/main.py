@@ -19,13 +19,32 @@ cambia, solo cambia la configuración.
   - En Kubernetes/EKS:   http://products-service:8001  (mismo nombre, DNS interno)
 """
 import os
-
-
 import time
 import psutil
+import httpx
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 INICIO = time.time()
 READY_MAX_MEM_PERCENT = float(os.getenv("READY_MAX_MEM_PERCENT", "90"))
+
+app = FastAPI(
+    title="Orders Service",
+    description="Gestión de pedidos de la tienda (Módulo 3 - ISY1101)",
+    version="1.0.0",
+)
+
+# Configuración vía variables de entorno (con valores por defecto para local).
+PRODUCTS_SERVICE_URL = os.getenv("PRODUCTS_SERVICE_URL", "http://localhost:8001")
+INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL", "http://localhost:8002")
+
+# "Base de datos" de pedidos en memoria.
+ORDERS = []
+
+
+class OrderRequest(BaseModel):
+    product_id: int = Field(description="Id del producto a pedir")
+    quantity: int = Field(gt=0, description="Cantidad de unidades")
 
 
 @app.get("/live")
@@ -45,29 +64,6 @@ def ready():
             detail={"ready": False, "cpu_%": cpu, "memoria_%": memoria, "umbral_%": READY_MAX_MEM_PERCENT},
         )
     return {"ready": True, "cpu_%": cpu, "memoria_%": memoria}
-
-
-import httpx
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
-app = FastAPI(
-    title="Orders Service",
-    description="Gestión de pedidos de la tienda (Módulo 3 - ISY1101)",
-    version="1.0.0",
-)
-
-# Configuración vía variables de entorno (con valores por defecto para local).
-PRODUCTS_SERVICE_URL = os.getenv("PRODUCTS_SERVICE_URL", "http://localhost:8001")
-INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL", "http://localhost:8002")
-
-# "Base de datos" de pedidos en memoria.
-ORDERS = []
-
-
-class OrderRequest(BaseModel):
-    product_id: int = Field(description="Id del producto a pedir")
-    quantity: int = Field(gt=0, description="Cantidad de unidades")
 
 
 @app.get("/health")
